@@ -10,6 +10,9 @@ def mock_request():
     request.scope = {}
     request.receive = AsyncMock()
     request._send = AsyncMock()
+    # handle_messages() now buffers the body up front (PR #1319), so the mock
+    # must expose an awaitable body() returning a valid JSON-RPC payload.
+    request.body = AsyncMock(return_value=b'{"jsonrpc": "2.0", "method": "ping", "id": 1}')
     return request
 
 
