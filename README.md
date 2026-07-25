@@ -264,7 +264,7 @@ python --version
 ### Step 1: Install CodeGraphContext
 
 ```bash
-pip install codegraphcontext
+pip install codegraphcontext  # Installs CodeGraphContext and required dependencies
 ```
 
 This command installs CodeGraphContext and all required dependencies.
@@ -288,7 +288,7 @@ CodeGraphContext automatically uses an embedded database by default, so no addit
 ### Index a Repository
 
 ```bash
-codegraphcontext index .
+codegraphcontext index .  # Scans current directory and builds code graph
 ```
 
 This scans the current project and creates a searchable code graph.
@@ -316,7 +316,7 @@ Finds potentially unused code in the indexed repository.
 After indexing a repository, run:
 
 ```bash
-codegraphcontext list
+codegraphcontext list  # Shows all indexed repositories in the system
 ```
 
 If the command executes successfully and displays indexed repositories, your setup is complete and CodeGraphContext is ready to use.
