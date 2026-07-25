@@ -43,8 +43,12 @@ class TestPythonParser:
         
         assert "functions" in result
         funcs = result["functions"]
-        assert len(funcs) == 1
-        assert funcs[0]["name"] == "hello"
+        # The parser appends a synthetic "<module>" frame for module-level
+        # context (see _attach_module_context); exclude it when asserting on
+        # user-defined functions.
+        user_funcs = [f for f in funcs if f["name"] != "<module>"]
+        assert len(user_funcs) == 1
+        assert user_funcs[0]["name"] == "hello"
 
     def test_module_level_call_uses_module_context(self, parser, temp_test_dir):
         """Top-level executable calls should be linked from a synthetic module frame."""

@@ -236,6 +236,9 @@ def kuzudb_env():
 def cli_test_stubs(monkeypatch, tmp_path):
     monkeypatch.setattr(cli_main.config_manager, "CONFIG_DIR", tmp_path)
     monkeypatch.setattr(cli_main.config_manager, "CONFIG_FILE", tmp_path / "config.json")
+    # `delete`/`rm` are gated behind ALLOW_DB_DELETION; enable it so the
+    # canonical-command smoke matrix can exercise them without a real config.
+    monkeypatch.setattr(cli_main.config_manager, "is_db_deletion_allowed", lambda: True)
 
     monkeypatch.setattr(cli_main, "_load_credentials", lambda *_args, **_kwargs: None)
     monkeypatch.setattr(cli_main, "configure_mcp_client", lambda *_args, **_kwargs: None)
@@ -385,7 +388,7 @@ def test_cli_inventory_grouped_from_source():
     assert inventory["mcp"] == {"setup", "start", "tools"}
     assert inventory["neo4j"] == {"setup"}
     assert inventory["config"] == {"show", "set", "reset", "db"}
-    assert inventory["bundle"] == {"export", "import", "load"}
+    assert inventory["bundle"] == {"export", "import", "load", "merge"}
     assert inventory["hook"] == {"install", "uninstall", "status"}
     assert inventory["registry"] == {"list", "search", "download", "request"}
     assert inventory["find"] == {"name", "pattern", "type", "variable", "content", "decorator", "argument"}
@@ -501,6 +504,9 @@ def test_all_canonical_cli_commands_run_with_kuzudb(kuzudb_env, cli_test_stubs):
 
     expected_inventory = source_inventory
     expected_set = {(family, name) for family, names in expected_inventory.items() for name in names}
+    # `bundle merge` is a non-interactive git merge driver that takes file
+    # arguments; it is not exercised by this smoke matrix.
+    expected_set.discard(("bundle", "merge"))
     assert _matrix_command_set(command_matrix) == expected_set
 
     for args in command_matrix:

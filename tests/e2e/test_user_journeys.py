@@ -63,8 +63,11 @@ class TestUserJourneys:
 
     @pytest.mark.skipif(not KUZU_AVAILABLE, reason="KuzuDB not installed")
     @pytest.mark.slow
-    def test_clean_up(self, temp_test_dir):
+    def test_clean_up(self, temp_test_dir, monkeypatch):
         """User wants to remove a repo."""
+        # Deletion is gated behind ALLOW_DB_DELETION (opt-in safety flag);
+        # enable it for this journey so the delete subprocess is permitted.
+        monkeypatch.setenv("ALLOW_DB_DELETION", "true")
         # Setup: Create dummy repo
         dummy_dir = temp_test_dir / "to_delete"
         dummy_dir.mkdir()
